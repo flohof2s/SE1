@@ -34,7 +34,7 @@ public class PersistenceStrategyStream<E> implements PersistenceStrategy<E> {
             oos.close();
             fos.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new PersistenceException(PersistenceException.ExceptionType.ConnectionNotAvailable,e.getMessage());
         }
     }
 
@@ -75,12 +75,8 @@ public class PersistenceStrategyStream<E> implements PersistenceStrategy<E> {
             }
             ois.close();
             is.close();
-        }catch(FileNotFoundException fnf){
-            System.out.println(fnf.getMessage());
-        }catch(IOException ioe){
-            System.out.println(ioe.getMessage()+"");
-        }catch(ClassNotFoundException cnf){
-            System.out.println(cnf.getMessage()+"1");
+        }catch(Exception e){
+            throw new PersistenceException(PersistenceException.ExceptionType.ConnectionNotAvailable,e.getMessage());
         }
 
         return list;

@@ -6,6 +6,7 @@ import U3.src.control.Container;
 import U3.src.control.Member;
 import U3.src.control.exceptions.ContainerException;
 import U3.src.persistence.PersistenceStrategy;
+import U3.src.persistence.PersistenceStrategyMongoDB;
 import U3.src.persistence.PersistenceStrategyStream;
 import U3.src.persistence.exceptions.PersistenceException;
 import U3.src.view.MemberView;
@@ -35,11 +36,6 @@ public class ContainerTest {
         } catch (PersistenceException e) {
             fail(e.getMessage());
         }
-        try {
-            con.load();
-        } catch (PersistenceException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @BeforeEach
@@ -49,6 +45,71 @@ public class ContainerTest {
         } catch (PersistenceException e) {
             fail(e.getMessage());
         }
+    }
+
+    @Test
+    public void noStrategySet(){
+        con.setPersistenceStrategy(null);
+        try{
+            con.store();
+            fail();
+        }catch(PersistenceException e){
+            assertEquals(e.getExceptionTypeType(), PersistenceException.ExceptionType.NoStrategyIsSet);
+        }
+
+    }
+
+    @Test
+    public void useMongoDBasPersistenceStrategy(){
+        con.setPersistenceStrategy(new PersistenceStrategyMongoDB<Member>());
+        try{
+            con.store();
+            fail();
+        }catch(PersistenceException e){
+            assertEquals(e.getExceptionTypeType(), PersistenceException.ExceptionType.ImplementationNotAvailable);
+        }
+    }
+
+    @Test
+    public void wrongFileLocation(){
+        try {
+            con.store();
+        } catch (PersistenceException e) {
+            fail();
+        }
+
+        PersistenceStrategyStream<Member> p2 = new PersistenceStrategyStream<Member>();
+        p2.setLocation("/objects.ser");
+        con.setPersistenceStrategy(p2);
+
+        try{
+            con.load();
+            fail();
+        }catch(PersistenceException e){
+            assertEquals(e.getExceptionTypeType(), PersistenceException.ExceptionType.ConnectionNotAvailable);
+        }
+    }
+
+    @Test
+    public void roundTripTest(){
+        assertEquals(con.size(),0);
+        try{
+            con.addMember(new ConcreteMember(1));
+            assertEquals(con.size(),1);
+            con.addMember(new ConcreteMember(2));
+            assertEquals(con.size(),2);
+            con.store();
+            assertEquals(con.size(),2);
+            con.deleteMember(1);
+            assertEquals(con.size(),1);
+            con.deleteMember(2);
+            assertEquals(con.size(),0);
+            con.load();
+            assertEquals(con.size(),2);
+        }catch(Exception e){
+            fail(e.getMessage());
+        }
+
     }
 
     @Test
