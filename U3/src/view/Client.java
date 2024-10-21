@@ -3,6 +3,7 @@ package U3.src.view;
 import U3.src.control.ConcreteMember;
 import U3.src.control.Container;
 import U3.src.control.exceptions.ContainerException;
+import U3.src.persistence.exceptions.PersistenceException;
 
 public class Client {
     Container con;

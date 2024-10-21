@@ -22,9 +22,9 @@ public class Container implements Serializable {
         return instance;
     }
 
-    public void addMember(Member member) throws ContainerException {
+    public void addMember(Member member) throws ContainerException,NullPointerException {
         if(member==null){
-            throw new ContainerException("Übergebenes Objekt ist null");
+            throw new NullPointerException();
         }
         for(Member m : this.members){
             if(member.getID().equals(m.getID())){
@@ -57,11 +57,29 @@ public class Container implements Serializable {
     }
 
     public void store() throws PersistenceException {
-        this.p.save(this.members);
+        try{
+            this.p.save(this.members);
+        }catch(UnsupportedOperationException uoe){
+            throw new PersistenceException(PersistenceException.ExceptionType.ImplementationNotAvailable,"Es ist keine Implementation vorhanden");
+        }catch(NullPointerException npe ){
+            throw new PersistenceException(PersistenceException.ExceptionType.NoStrategyIsSet,"Es wurde keine Persistence Strategie gesetzt");
+        }catch(Exception e){
+            throw new PersistenceException(PersistenceException.ExceptionType.ConnectionNotAvailable,e.getMessage());
+        }
+
     }
 
     public void load() throws PersistenceException {
-        this.members = this.p.load();
+        try{
+            this.members = this.p.load();
+        }catch(UnsupportedOperationException uoe){
+            throw new PersistenceException(PersistenceException.ExceptionType.ImplementationNotAvailable,"Es ist keine Implementation vorhanden");
+        }catch(NullPointerException npe ){
+            throw new PersistenceException(PersistenceException.ExceptionType.NoStrategyIsSet,"Es wurde keine Persistence Strategie gesetzt");
+        }catch(Exception e){
+            throw new PersistenceException(PersistenceException.ExceptionType.ConnectionNotAvailable,e.getMessage());
+        }
+
     }
 
     public void setPersistenceStrategy(PersistenceStrategy<Member> p){
