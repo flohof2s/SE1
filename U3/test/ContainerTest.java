@@ -18,6 +18,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.Iterator;
+import java.util.List;
 
 public class ContainerTest {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
@@ -25,14 +27,19 @@ public class ContainerTest {
     private final PrintStream originalOut = System.out;
     private final PrintStream originalErr = System.err;
     static Container con;
+    static MemberView mv;
+    static PersistenceStrategyStream<Member> p;
 
     @BeforeAll
     public static void init(){
+        mv = new MemberView();
         con = Container.getInstance();
-        PersistenceStrategy<Member> p = new PersistenceStrategyStream<>();
+        p = new PersistenceStrategyStream<>();
         con.setPersistenceStrategy(p);
         try {
             con.store();
+            System.out.print("Dump container: ");
+            mv.dump(con.getCurrentList());
         } catch (PersistenceException e) {
             fail(e.getMessage());
         }
@@ -41,7 +48,10 @@ public class ContainerTest {
     @BeforeEach
     public void setup(){
         try {
+            con.setPersistenceStrategy(p);
             con.load();
+            con.getCurrentList().clear();
+            con.store();
         } catch (PersistenceException e) {
             fail(e.getMessage());
         }
