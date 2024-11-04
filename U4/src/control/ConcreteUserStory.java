@@ -52,7 +52,7 @@ public class ConcreteUserStory implements UserStory{
 
     @Override
     public float getPrio() {
-        return this.calculatePrio(1,2,3,4);
+        return this.calculatePrio(this.getRelativeValue(),this.getRelativePenalty(),this.getRelativeRisk(),this.getExpense());
     }
 
     @Override
