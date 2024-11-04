@@ -6,6 +6,7 @@ import U4.src.control.UserStory;
 import U4.src.control.exceptions.ContainerException;
 import U4.src.persistence.exceptions.PersistenceException;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Client {
@@ -48,47 +49,51 @@ public class Client {
     }
 
     private void commandEnter(Container con,Scanner sc){
-        System.out.println("Wie soll Ihre User Story heißen?");
-        String title = sc.nextLine();
-
-        System.out.println("Welche ID soll Ihre User Story haben?");
-        Integer ID = sc.nextInt();
+        String title = this.readLine("Wie soll Ihre User Story heißen?",sc);
+        Integer ID = this.readLine("Welche ID soll Ihre User Story haben?",sc,0,Integer.MAX_VALUE);
         sc.nextLine();
-
-        System.out.println("Welches Akzeptanzkriterium soll Ihre User Story haben?");
-        String acceptanceCriteria = sc.nextLine();
-
-        System.out.println("Welchen Relativen Mehrwert hat Ihre User Story? (1-5)");
-        int relValue = sc.nextInt();
-        while(relValue<1 || relValue>5){
-            System.out.println("Bitte geben Sie einen Wert zwischen 1 und 5 ein!");
-            relValue = sc.nextInt();
-        }
-
-        System.out.println("Welche Relative Strafe hat Ihre User Story? (1-5)");
-        int relPenalty = sc.nextInt();
-        while(relPenalty<1 || relPenalty>5){
-            System.out.println("Bitte geben Sie einen Wert zwischen 1 und 5 ein!");
-            relPenalty = sc.nextInt();
-        }
-
-        System.out.println("Welches Relative Risiko hat Ihre User Story? (1-5)");
-        int relRisk = sc.nextInt();
-        while(relRisk<1 || relRisk>5){
-            System.out.println("Bitte geben Sie einen Wert zwischen 1 und 5 ein!");
-            relRisk = sc.nextInt();
-        }
-
-        System.out.println("Welcher Aufwand hat Ihre User Story?");
-        int expense = sc.nextInt();
+        String acceptanceCriteria = this.readLine("Welches Akzeptanzkriterium soll Ihre User Story haben?",sc);
+        int relValue = this.readLine("Welchen Relativen Mehrwert hat Ihre User Story? (1-5)",sc,1,5);
+        int relPenalty = this.readLine("Welche Relative Strafe hat Ihre User Story? (1-5)",sc,1,5);
+        int relRisk = this.readLine("Welches Relative Risiko hat Ihre User Story? (1-5)",sc,1,5);
+        int expense = this.readLine("Welcher Aufwand hat Ihre User Story?",sc,0,Integer.MAX_VALUE);
         sc.nextLine();
-        System.out.println("Zu welchem Projekt gehört Ihre User Story?");
-        String project = sc.nextLine();
+        String project = this.readLine("Zu welchem Projekt gehört Ihre User Story?",sc);
 
         try{
             con.addUserStory(new ConcreteUserStory(ID,title,relValue,relPenalty,relRisk,expense,acceptanceCriteria,project));
         } catch (ContainerException e) {
             System.out.println("Es ist etwas schief gelaufen! Fehler: "+e.getMessage());
+        }
+    }
+
+    private int readLine(String message,Scanner sc, int min, int max){
+        System.out.println(message);
+        try{
+            int result = sc.nextInt();
+            if(result<min || result>max){
+                System.out.println("Bitte geben Sie einen Wert zwischen "+min+" und "+max+" ein!");
+                return this.readLine(message,sc,min,max);
+            }
+            return result;
+        } catch (InputMismatchException e){
+            System.out.println("Sie müssen eine gültige Zahl als Eingabe wählen!");
+            sc.nextLine();
+            return this.readLine(message,sc,min,max);
+        } catch (Exception e){
+            System.out.println("Es ist ein Fehler aufgetreten: "+e.getMessage());
+            sc.nextLine();
+            return this.readLine(message,sc,min,max);
+        }
+    }
+    private String readLine(String message,Scanner sc){
+        System.out.println(message);
+        try{
+            return sc.nextLine();
+        }catch(Exception e){
+            System.out.println("Es ist ein Fehler aufgetreten: "+e.getMessage());
+            sc.nextLine();
+            return this.readLine(message,sc);
         }
     }
 
