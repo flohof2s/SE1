@@ -2,7 +2,7 @@ package U4.src.control;
 
 import java.io.Serializable;
 
-public interface UserStory extends Serializable {
+public interface UserStory extends Serializable, Comparable<UserStory> {
     public String getTitle();
     public Integer getID();
     public int getRelativeValue();

@@ -20,11 +20,12 @@ public class Client {
     }
 
     private void start(Container con, Scanner sc){
-        String command = "";
-        while(!command.equals("exit")) {
+        String[] command = new String[]{""};
+        while(!command[0].equals("exit")) {
             System.out.println("Geben Sie Ihr Befehl ein:");
-            command = sc.nextLine();
-            switch (command) {
+            System.out.print("> ");
+            command = sc.nextLine().split(" ");
+            switch (command[0]) {
                 case "enter":
                     this.commandEnter(con,sc);
                     break;
@@ -35,7 +36,7 @@ public class Client {
                     this.commandLoad(con);
                     break;
                 case "dump":
-                    this.commandDump(con);
+                    this.commandDump(con,command);
                     break;
                 case "exit":
                     break;
@@ -43,7 +44,7 @@ public class Client {
                     this.commandHelp();
                     break;
                 default:
-                    System.out.println("Der Befehl \"" + command + "\" wurde nicht erkannt. Nutze \"help\" für Hilfe!");
+                    System.out.println("Der Befehl \"" + command[0] + "\" wurde nicht erkannt. Nutze \"help\" für Hilfe!");
             }
         }
     }
@@ -113,8 +114,17 @@ public class Client {
         }
     }
 
-    private void commandDump(Container con){
-        UserStoryView.dump(con.getCurrentList());
+    private void commandDump(Container con, String[] command){
+        if(command.length>1 && command[1].equals("projekt")){
+            if(command.length==2){
+                System.out.println("Der angegebene Befehl ist unvollständig! Sie müssen das Projekt spezifizieren!");
+            }else{
+                UserStoryView.dump(con.getCurrentList(),command[2]);
+            }
+        }else{
+            UserStoryView.dump(con.getCurrentList(),"");
+        }
+
     }
 
     private void commandHelp(){
@@ -123,7 +133,7 @@ public class Client {
                 "enter:\tFügt eine neue User Story hinzu\n" +
                 "store:\tSpeichert alle User Stories in den Speicher\n" +
                 "load:\tLädt alle User Stories aus dem Speicher\n" +
-                "dump:\tGibt alle User Stories aus\n" +
+                "dump( projekt PROJEKTNAME):\tGibt alle User Stories aus. Ist kein Parameter angegeben, erfolgt die Ausgabe nach Priorisierung, sonst nach Projekt\n" +
                 "exit:\tBeendet das Programm\n");
     }
 }

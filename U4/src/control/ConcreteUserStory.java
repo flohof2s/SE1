@@ -67,10 +67,25 @@ public class ConcreteUserStory implements UserStory{
 
     @Override
     public String toString(){
+        return String.format("%3s %20s %20s %5s %20s",this.getID(),this.getTitle(),this.getAcceptanceCriteria(),(double)Math.round(this.getPrio()*100)/100,this.getProject());
+        //return this.getID()+"\t"+this.getTitle()+"\t"+this.getAcceptanceCriteria()+"\t\t\t"+this.getPrio()+"\t"+this.getProject();
+        /*
         return  "User Story (ID="+this.getID()+")" +"\n"+
                 "Titel:\t"+this.getTitle() +"\n"+
                 "Akzeptanzkriterium:\t"+this.getAcceptanceCriteria() +"\n"+
                 "Projekt:\t"+this.getProject() +"\n"+
                 "Priorität:\t" +this.getPrio();
+        */
+
+    }
+
+    @Override
+    public int compareTo(UserStory o) {
+        if(this.getPrio()>o.getPrio()){
+            return -1;
+        }else if(this.getPrio()<o.getPrio()){
+            return 1;
+        }
+        return 0;
     }
 }

@@ -6,7 +6,9 @@ import U4.src.persistence.PersistenceStrategy;
 import U4.src.persistence.exceptions.PersistenceException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collector;
 
 public class Container {
     private static final Container instance = new Container();
@@ -15,6 +17,7 @@ public class Container {
 
     private Container(){
         this.userStories = new ArrayList<UserStory>();
+        Collections.sort(this.userStories);
     }
 
     public static Container getInstance(){
@@ -34,7 +37,7 @@ public class Container {
         this.userStories.add(userStory);
     }
 
-    public String deleteUserStory(Integer id){
+    public String deleteUserStory(Integer id) throws ContainerException {
 
         for(UserStory us : this.userStories){
             if(us.getID().equals(id)){
@@ -42,7 +45,7 @@ public class Container {
                 return "Das Member-Objekt mit der ID "+id+" wurde erfolgreich gelöscht!";
             }
         }
-        return "Das Member-Objekt mit der ID "+id+" ist nicht vorhanden und kann nicht gelöscht werden!";//TODO Exception einfügen
+        throw new ContainerException("Das Member-Objekt mit der ID "+id+" ist nicht vorhanden und kann nicht gelöscht werden!");
     }
 
 
